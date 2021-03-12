@@ -1,0 +1,12 @@
+Fast Commit Debugging BPF Script
+--------------------------------
+
+* Please ensure that the kernel supports fast_commit feature.
+
+* Install bpftrace package
+
+  $ sudo apt-get install bpftrace
+
+* Running the script
+
+  $ bpftrace fc_debug.bt
