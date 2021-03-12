@@ -9,8 +9,8 @@
 #include "fc.h"
 
 BEGIN {
-	// Endianness
-	@g_bigendian = 0;
+	// Endianness, 1: big_endian, 0: little_endian
+	@g_bigendian = 1;
    }
 
 kprobe:ext4_fc_add_tlv {
