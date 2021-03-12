@@ -1,0 +1,130 @@
+#!/usr/bin/bpftrace
+
+   //
+   // Script to debug fast commit issues
+   //
+
+#include "linux/fs.h"
+#include "linux/jbd2.h"
+#include "fc.h"
+
+BEGIN {
+	// Endianness
+	@g_bigendian = 0;
+   }
+
+kprobe:ext4_fc_add_tlv {
+	$sb = (struct super_block *)(arg0);
+
+	if (arg1 == FC_HEAD) {
+		$head = (struct ext4_fc_head *)arg3;
+
+		if (@g_bigendian == 1) {
+			printf("pid %d, dev %x, commit, HEAD, tid %d\n", tid, $sb->s_dev,
+			       $head->tid.b0 << 24 | $head->tid.b1 << 16 | $head->tid.b2 << 8 | $head->tid.b3 << 0);
+		} else {
+			printf("pid %d, dev %x, commit, HEAD, tid %d\n", tid, $sb->s_dev,
+			       $head->tid.b3 << 24 | $head->tid.b2 << 16 | $head->tid.b1 << 8 | $head->tid.b0 << 0);
+		}
+	} else if (arg1 == FC_ADD_RANGE) {
+		$range = (struct ext4_fc_add_range *)arg3;
+
+		if (@g_bigendian == 1) {
+			printf("pid %d, dev %x, commit, ADD, i %d, l %d, ln %hu, ph %hu, pl %u\n",
+			       tid, $sb->s_dev,
+			       $range->ino.b0 << 24 | $range->ino.b1 << 16 | $range->ino.b2 << 8 | $range->ino.b3,
+			       $range->ee_block.b0 << 24 | $range->ee_block.b1 << 16 | $range->ee_block.b2 << 8 | $range->ee_block.b3,
+			       $range->ee_len.b0 << 8 | $range->ee_len.b1,
+			       $range->ee_start_hi.b0 << 8 | $range->ee_start_hi.b1,
+			       $range->ee_start_lo.b0 << 24 | $range->ee_start_lo.b1 << 16 | $range->ee_start_lo.b2 << 8 | $range->ee_start_lo.b3);
+		} else {
+			printf("pid %d, dev %x, commit, ADD, i %d, l %d, ln %hu, ph %hu, pl %u\n",
+			       tid, $sb->s_dev,
+			       $range->ino.b3 << 24 | $range->ino.b2 << 16 | $range->ino.b1 << 8 | $range->ino.b0,
+			       $range->ee_block.b3 << 24 | $range->ee_block.b2 << 16 | $range->ee_block.b1 << 8 | $range->ee_block.b0,
+			       $range->ee_len.b1 << 8 | $range->ee_len.b0,
+			       $range->ee_start_hi.b1 << 8 | $range->ee_start_hi.b0,
+			       $range->ee_start_lo.b3 << 24 | $range->ee_start_lo.b2 << 16 | $range->ee_start_lo.b1 << 8 | $range->ee_start_lo.b0);
+		}
+	} else if (arg1 == FC_DEL_RANGE) {
+		$range2 = (struct ext4_fc_del_range *)arg3;
+
+		if (@g_bigendian == 1) {
+			printf("pid %d, dev %x, commit, DEL, i %d, l %d, ln %d\n", tid, $sb->s_dev,
+			       $range2->ino.b0 << 24 | $range2->ino.b1 << 16 | $range2->ino.b2 << 8 | $range2->ino.b3,
+			       $range2->lblk.b0 << 24 | $range2->lblk.b1 << 16 | $range2->lblk.b2 << 8 | $range2->lblk.b3,
+			       $range2->len.b0 << 24 | $range2->len.b1 << 16 | $range2->len.b1 << 8 | $range2->len.b0);
+		} else {
+			printf("pid %d, dev %x, commit, DEL, i %d, l %d, ln %d\n", tid, $sb->s_dev,
+			       $range2->ino.b3 << 24 | $range2->ino.b2 << 16 | $range2->ino.b1 << 8 | $range2->ino.b0,
+			       $range2->lblk.b3 << 24 | $range2->lblk.b2 << 16 | $range2->lblk.b1 << 8 | $range2->lblk.b0,
+			       $range2->len.b3 << 24 | $range2->len.b2 << 16 | $range2->len.b1 << 8 | $range2->len.b0);
+		}
+		printf("pid %d, dev %x, commit, DEL, i %d, l %d, ln %d\n", tid, $sb->s_dev, *(arg3), *(arg3 + 4), *(arg3 + 8));
+	} else if (arg1 == 6) {
+		$inode = (struct ext4_fc_inode *)arg3;
+
+		if (@g_bigendian == 1) {
+			printf("pid %d, dev %x, commit, INODE, i %d\n", tid, $sb->s_dev,
+			       $inode->ino.b0 << 24 | $inode->ino.b1 << 16 | $inode->ino.b2 << 8 | $inode->ino.b3);
+		} else {
+			printf("pid %d, dev %x, commit, INODE, i %d\n", tid, $sb->s_dev,
+			       $inode->ino.b3 << 24 | $inode->ino.b2 << 16 | $inode->ino.b1 << 8 | $inode->ino.b0);
+		}
+	} else if (arg1 == 7) {
+		$tail = (struct ext4_fc_tail *)arg3;
+
+		if (@g_bigendian == 1) {
+			printf("pid %d, dev %x, commit, TAIL, tid %d\n", tid, $sb->s_dev,
+			       $tail->tid.b0 << 24 | $tail->tid.b1 << 16 | $tail->tid.b2 << 8 | $tail->tid.b3);
+		} else {
+			printf("pid %d, dev %x, commit, TAIL, i %d\n", tid, $sb->s_dev,
+			       $tail->tid.b3 << 24 | $tail->tid.b2 << 16 | $tail->tid.b1 << 8 | $tail->tid.b0);
+		}
+	}
+   }
+
+tracepoint:ext4:ext4_fc_commit_start {
+	printf("pid %d, dev %x, commit_start\n", tid, args->dev);
+   }
+
+tracepoint:ext4:ext4_fc_commit_stop {
+	printf("pid %d, dev %x, commit_stop, reason %s\n",
+	       tid, args->dev, args->reason == 0 ? "success" : "fail");
+   }
+
+kprobe:ext4_fc_add_dentry_tlv {
+	$sb = (struct super_block *)(arg0);
+
+	if (arg2 == FC_CREATE) {
+		printf("pid %d, dev %x, commit, CREAT, parent %d, i %d, <no-name>\n", tid, $sb->s_dev, arg3, arg4);
+	} else if (arg2 == FC_LINK) {
+		printf("pid %d, dev %x, commit, LINK, parent %d, i %d, <no-name>\n", tid, $sb->s_dev, arg3, arg4);
+	} else if (arg2 == FC_UNLINK) {
+		printf("pid %d, dev %x, commit, UNLINK, parent %d, i %d, <no-name>\n", tid, $sb->s_dev, arg3, arg4);
+	}
+   }
+
+kprobe:ext4_fc_write_tail {
+	$sb = (struct super_block *)(arg0);
+
+	printf("pid %d, dev %x, commit, TAIL\n", tid, $sb->s_dev);
+   }
+
+kprobe:ext4_fc_write_inode {
+	$inode = (struct inode *)(arg0);
+
+	printf("pid %d, dev %x, commit, i %d, TAIL\n", tid, $inode->i_sb->s_dev, $inode->i_ino);
+   }
+
+tracepoint:ext4:ext4_fc_replay {
+	if (args->tag == 1) {
+		printf("pid %d, dev %x, replay, ADD, i %d, l %d, ln %hu, p ignored\n", tid, args->dev, args->ino, args->priv1, args->priv2);
+	} else if (args->tag == 2) {
+		printf("pid %d, dev %x, replay, DEL, i %d, l %d, ln %hu, p ignored\n", tid, args->dev, args->ino, args->priv1, args->priv2);
+	} else if (args->tag == 6) {
+		printf("pid %d, dev %x, replay, INODE, i %d\n", tid, args->dev,args->ino);
+	} else if (args->tag == 8) {
+		printf("pid %d, dev %x, replay, TAIL\n", tid, args->dev);
+	}
+   }
