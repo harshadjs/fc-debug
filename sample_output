@@ -1,0 +1,51 @@
+Attaching 8 probes...
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit_stop, reason fail
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit, HEAD, tid 196608
+pid 187022, dev fd00000, commit, ADD, i 12, l 23, ln 10, ph 0, pl 9331
+pid 187022, dev fd00000, commit, i 12, TAIL
+pid 187022, dev fd00000, commit, TAIL
+pid 187022, dev fd00000, commit_stop, reason success
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit, ADD, i 12, l 10, ln 1, ph 0, pl 9318
+pid 187022, dev fd00000, commit, ADD, i 12, l 11, ln 32780, ph 0, pl 9319
+pid 187022, dev fd00000, commit, i 12, TAIL
+pid 187022, dev fd00000, commit, TAIL
+pid 187022, dev fd00000, commit_stop, reason success
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit, ADD, i 12, l 13, ln 2, ph 0, pl 9321
+pid 187022, dev fd00000, commit, i 12, TAIL
+pid 187022, dev fd00000, commit, TAIL
+pid 187022, dev fd00000, commit_stop, reason success
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit, ADD, i 12, l 18, ln 1, ph 0, pl 9326
+pid 187022, dev fd00000, commit, i 12, TAIL
+pid 187022, dev fd00000, commit, TAIL
+pid 187022, dev fd00000, commit_stop, reason success
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit, ADD, i 12, l 22, ln 1, ph 0, pl 9330
+pid 187022, dev fd00000, commit, i 12, TAIL
+pid 187022, dev fd00000, commit, TAIL
+pid 187022, dev fd00000, commit_stop, reason success
+pid 187022, dev fd00000, commit_start
+pid 187022, dev fd00000, commit, TAIL
+pid 187022, dev fd00000, commit_stop, reason success
+pid 187044, dev fd00000, replay, ADD, i 12, l 23, ln 10, p ignored
+pid 187044, dev fd00000, replay, INODE, i 12
+pid 187044, dev fd00000, replay, TAIL
+pid 187044, dev fd00000, replay, ADD, i 12, l 10, ln 1, p ignored
+pid 187044, dev fd00000, replay, ADD, i 12, l 11, ln 12, p ignored
+pid 187044, dev fd00000, replay, INODE, i 12
+pid 187044, dev fd00000, replay, TAIL
+pid 187044, dev fd00000, replay, ADD, i 12, l 13, ln 2, p ignored
+pid 187044, dev fd00000, replay, INODE, i 12
+pid 187044, dev fd00000, replay, TAIL
+pid 187044, dev fd00000, replay, ADD, i 12, l 18, ln 1, p ignored
+pid 187044, dev fd00000, replay, INODE, i 12
+pid 187044, dev fd00000, replay, TAIL
+pid 187044, dev fd00000, replay, ADD, i 12, l 22, ln 1, p ignored
+pid 187044, dev fd00000, replay, INODE, i 12
+pid 187044, dev fd00000, replay, TAIL
+pid 187044, dev fd00000, replay, TAIL
+
